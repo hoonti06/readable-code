@@ -94,14 +94,12 @@ public class MinesweeperGame {
 
     private static String getUserActionInputFromUser() {
         System.out.println("선택한 셀에 대한 행위를 선택하세요. (1: 오픈, 2: 깃발 꽂기)");
-        String userActionInput = SCANNER.nextLine();
-        return userActionInput;
+        return SCANNER.nextLine();
     }
 
     private static String getCellInputFromUser() {
         System.out.println("선택할 좌표를 입력하세요. (예: a1)");
-        String cellInput = SCANNER.nextLine();
-        return cellInput;
+        return SCANNER.nextLine();
     }
 
     private static boolean doesUserLoseTheGame() {
