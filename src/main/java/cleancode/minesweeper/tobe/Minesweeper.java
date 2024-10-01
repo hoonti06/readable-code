@@ -72,7 +72,7 @@ public class Minesweeper {
             checkIfGameIsOver();
             return;
         }
-        throw new AppException("잘못된 번호를 선택하셨습니다.");
+        throw new GameException("잘못된 번호를 선택하셨습니다.");
     }
 
     private void changeGameStatusToLose() {
