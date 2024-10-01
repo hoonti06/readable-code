@@ -1,5 +1,9 @@
 package cleancode.minesweeper.tobe;
 
+import cleancode.minesweeper.tobe.cell.Cell;
+import cleancode.minesweeper.tobe.cell.EmptyCell;
+import cleancode.minesweeper.tobe.cell.LandMineCell;
+import cleancode.minesweeper.tobe.cell.NumberCell;
 import cleancode.minesweeper.tobe.gamelevel.GameLevel;
 
 import java.util.Arrays;
@@ -81,15 +85,16 @@ public class GameBoard {
 
         for (int row = 0; row < rowSize; row++) {
             for (int col = 0; col < colSize; col++) {
-                board[row][col] = Cell.create();
+                board[row][col] = new EmptyCell();
             }
         }
 
         for (int i = 0; i < landMineCount; i++) {
             int landMineCol = new Random().nextInt(colSize);
             int landMineRow = new Random().nextInt(rowSize);
-            Cell cell = findCell(landMineRow, landMineCol);
-            cell.turnOnLandMine();
+            LandMineCell landMineCell = new LandMineCell();
+            landMineCell.turnOnLandMine();
+            board[landMineRow][landMineCol] = landMineCell;
         }
 
         for (int row = 0; row < rowSize; row++) {
@@ -98,8 +103,12 @@ public class GameBoard {
                     continue;
                 }
                 int count = countNearbyLandMines(row, col);
-                Cell cell = findCell(row, col);
-                cell.updateNearbyLandMineCount(count);
+                if (count == 0) {
+                    continue;
+                }
+                NumberCell numberCell = new NumberCell();
+                numberCell.updateNearbyLandMineCount(count);
+                board[row][col] = numberCell;
             }
         }
     }
