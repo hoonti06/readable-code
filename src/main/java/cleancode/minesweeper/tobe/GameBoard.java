@@ -93,7 +93,6 @@ public class GameBoard {
             int landMineCol = new Random().nextInt(colSize);
             int landMineRow = new Random().nextInt(rowSize);
             LandMineCell landMineCell = new LandMineCell();
-            landMineCell.turnOnLandMine();
             board[landMineRow][landMineCol] = landMineCell;
         }
 
@@ -106,8 +105,7 @@ public class GameBoard {
                 if (count == 0) {
                     continue;
                 }
-                NumberCell numberCell = new NumberCell();
-                numberCell.updateNearbyLandMineCount(count);
+                NumberCell numberCell = new NumberCell(count);
                 board[row][col] = numberCell;
             }
         }
