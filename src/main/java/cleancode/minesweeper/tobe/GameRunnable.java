@@ -1,8 +1,7 @@
 package cleancode.minesweeper.tobe;
 
-public interface Game {
-
-    void initialize();
+public interface GameRunnable {
 
     void run();
+
 }
