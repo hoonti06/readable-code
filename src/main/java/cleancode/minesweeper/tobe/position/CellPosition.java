@@ -48,4 +48,26 @@ public class CellPosition {
         return colIndex;
     }
 
+    public CellPosition calculatePositionBy(RelativePosition relativePosition) {
+        if (canCalculatePositionBy(relativePosition)) {
+            return CellPosition.of(
+                    rowIndex + relativePosition.getDeltaRow(),
+                    colIndex + relativePosition.getDeltaCol()
+            );
+        }
+        throw new IllegalArgumentException("잘못된 좌표입니다.");
+    }
+
+    public boolean canCalculatePositionBy(RelativePosition relativePosition) {
+        return rowIndex +  relativePosition.getDeltaRow() >= 0
+                && colIndex + relativePosition.getDeltaCol() >= 0;
+    }
+
+    public boolean isRowIndexLessThan(int rowIndex) {
+        return this.rowIndex < rowIndex;
+    }
+
+    public boolean isColIndexLessThan(int colIndex) {
+        return this.colIndex < colIndex;
+    }
 }

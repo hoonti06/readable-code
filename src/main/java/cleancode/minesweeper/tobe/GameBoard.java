@@ -6,8 +6,10 @@ import cleancode.minesweeper.tobe.cell.LandMineCell;
 import cleancode.minesweeper.tobe.cell.NumberCell;
 import cleancode.minesweeper.tobe.gamelevel.GameLevel;
 import cleancode.minesweeper.tobe.position.CellPosition;
+import cleancode.minesweeper.tobe.position.RelativePosition;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class GameBoard {
@@ -35,9 +37,6 @@ public class GameBoard {
     }
 
     public void openSurroundedCells(CellPosition cellPosition) {
-        if (row < 0 || row >= getRowSize() || col < 0 || col >= getColSize()) {
-            return;
-        }
         if (isOpenedCellAt(cellPosition)) {
             return;
         }
@@ -51,15 +50,8 @@ public class GameBoard {
             return;
         }
 
-        // [문제 발생] CellPosition은 rowIndex와 colIndex의 값을 0 미만으로 만들 수 없어서 난감한 상황
-        openSurroundedCells(row - 1, col - 1);
-        openSurroundedCells(row - 1, col);
-        openSurroundedCells(row - 1, col + 1);
-        openSurroundedCells(row, col - 1);
-        openSurroundedCells(row, col + 1);
-        openSurroundedCells(row + 1, col - 1);
-        openSurroundedCells(row + 1, col);
-        openSurroundedCells(row + 1, col + 1);
+        List<CellPosition> cellPositions = calculateSurroundedPositions(cellPosition, getRowSize(), getColSize());
+        cellPositions.forEach(this::openSurroundedCells);
     }
 
     private boolean isOpenedCellAt(CellPosition cellPosition) {
@@ -129,32 +121,20 @@ public class GameBoard {
         int rowSize = getRowSize();
         int colSize = getColSize();
 
-        int count = 0;
-        if (row - 1 >= 0 && col - 1 >= 0 && isLandMineCellAt(row - 1, col - 1)) {
-            count++;
-        }
-        if (row - 1 >= 0 && isLandMineCellAt(row - 1, col)) {
-            count++;
-        }
-        if (row - 1 >= 0 && col + 1 < colSize && isLandMineCellAt(row - 1, col + 1)) {
-            count++;
-        }
-        if (col - 1 >= 0 && isLandMineCellAt(row, col - 1)) {
-            count++;
-        }
-        if (col + 1 < colSize && isLandMineCellAt(row, col + 1)) {
-            count++;
-        }
-        if (row + 1 < rowSize && col - 1 >= 0 && isLandMineCellAt(row + 1, col - 1)) {
-            count++;
-        }
-        if (row + 1 < rowSize && isLandMineCellAt(row + 1, col)) {
-            count++;
-        }
-        if (row + 1 < rowSize && col + 1 < colSize && isLandMineCellAt(row + 1, col + 1)) {
-            count++;
-        }
-        return count;
+        long count = calculateSurroundedPositions(cellPosition, rowSize, colSize).stream()
+                .filter(this::isLandMineCellAt)
+                .count();
+
+        return (int) count;
+    }
+
+    private List<CellPosition> calculateSurroundedPositions(CellPosition cellPosition, int rowSize, int colSize) {
+        return RelativePosition.SURROUNDED_POSITIONS.stream()
+                .filter(cellPosition::canCalculatePositionBy)
+                .map(cellPosition::calculatePositionBy)
+                .filter(position -> position.isRowIndexLessThan(rowSize))
+                .filter(position -> position.isColIndexLessThan(colSize))
+                .toList();
     }
 
     public int getRowSize() {
