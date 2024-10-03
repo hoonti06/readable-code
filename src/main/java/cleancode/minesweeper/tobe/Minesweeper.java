@@ -58,8 +58,15 @@ public class Minesweeper implements GameInitializable, GameRunnable {
     }
 
     private void actOnCell(String cellInput, String userActionInput) {
-        final int selectedColIndex = boardIndexConverter.getSelectedColIndex(cellInput, gameBoard.getColSize());
-        final int selectedRowIndex = boardIndexConverter.getSelectedRowIndex(cellInput, gameBoard.getRowSize());
+        final int selectedColIndex = boardIndexConverter.getSelectedColIndex(cellInput);
+        if (gameBoard.isInvalidColIndex(selectedColIndex)) {
+            throw new GameException("잘못된 번호를 선택하셨습니다.");
+        }
+
+        final int selectedRowIndex = boardIndexConverter.getSelectedRowIndex(cellInput);
+        if (gameBoard.isInvalidRowIndex(selectedRowIndex)) {
+            throw new GameException("잘못된 번호를 선택하셨습니다.");
+        }
 
         if (doesUserChooseToPlantFlag(userActionInput)) {
             gameBoard.flag(selectedRowIndex, selectedColIndex);

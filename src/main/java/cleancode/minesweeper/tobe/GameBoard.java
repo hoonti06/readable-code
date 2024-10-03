@@ -151,6 +151,14 @@ public class GameBoard {
         return board[0].length;
     }
 
+    public boolean isInvalidRowIndex(int rowIndex) {
+        return getRowSize() >= rowIndex;
+    }
+
+    public boolean isInvalidColIndex(int colIndex) {
+        return getColSize() >= colIndex;
+    }
+
     public String getSign(int rowIndex, int colIndex) {
         Cell cell = findCell(rowIndex, colIndex);
         return cell.getSign();
