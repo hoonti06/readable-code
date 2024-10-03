@@ -5,6 +5,7 @@ import cleancode.minesweeper.tobe.cell.EmptyCell;
 import cleancode.minesweeper.tobe.cell.LandMineCell;
 import cleancode.minesweeper.tobe.cell.NumberCell;
 import cleancode.minesweeper.tobe.gamelevel.GameLevel;
+import cleancode.minesweeper.tobe.position.CellPosition;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -22,34 +23,35 @@ public class GameBoard {
         landMineCount = gameLevel.getLandMineCount();
     }
 
-    public void flag(int rowIndex, int colIndex) {
-        Cell cell = findCell(rowIndex, colIndex);
+    public void flagAt(CellPosition cellPosition) {
+        Cell cell = findCell(cellPosition);
         cell.flag();
 
     }
 
-    public void open(int rowIndex, int colIndex) {
-        Cell cell = findCell(rowIndex, colIndex);
+    public void openAt(CellPosition cellPosition) {
+        Cell cell = findCell(cellPosition);
         cell.open();
     }
 
-    public void openSurroundedCells(int row, int col) {
+    public void openSurroundedCells(CellPosition cellPosition) {
         if (row < 0 || row >= getRowSize() || col < 0 || col >= getColSize()) {
             return;
         }
-        if (isOpenedCell(row, col)) {
+        if (isOpenedCellAt(cellPosition)) {
             return;
         }
-        if (isLandMineCell(row, col)) {
-            return;
-        }
-
-        open(row, col);
-
-        if (doesCellHaveLandMineCount(row, col)) {
+        if (isLandMineCellAt(cellPosition)) {
             return;
         }
 
+        openAt(cellPosition);
+
+        if (doesCellHaveLandMineCountAt(cellPosition)) {
+            return;
+        }
+
+        // [문제 발생] CellPosition은 rowIndex와 colIndex의 값을 0 미만으로 만들 수 없어서 난감한 상황
         openSurroundedCells(row - 1, col - 1);
         openSurroundedCells(row - 1, col);
         openSurroundedCells(row - 1, col + 1);
@@ -60,16 +62,18 @@ public class GameBoard {
         openSurroundedCells(row + 1, col + 1);
     }
 
-    private boolean isOpenedCell(int row, int col) {
-        return findCell(row, col).isOpened();
+    private boolean isOpenedCellAt(CellPosition cellPosition) {
+        Cell cell = findCell(cellPosition);
+        return cell.isOpened();
     }
 
-    private boolean doesCellHaveLandMineCount(int row, int col) {
-        return findCell(row, col).hasLandMineCount();
+    private boolean doesCellHaveLandMineCountAt(CellPosition cellPosition) {
+        Cell cell = findCell(cellPosition);
+        return cell.hasLandMineCount();
     }
 
-    public boolean isLandMineCell(int selectedRowIndex, int selectedColIndex) {
-        Cell cell = findCell(selectedRowIndex, selectedColIndex);
+    public boolean isLandMineCellAt(CellPosition cellPosition) {
+        Cell cell = findCell(cellPosition);
         return cell.isLandMine();
     }
 
@@ -77,6 +81,14 @@ public class GameBoard {
         return Arrays.stream(board)
                 .flatMap(Arrays::stream)
                 .allMatch(Cell::isChecked);
+    }
+
+    public boolean isInvalidCellPosition(CellPosition cellPosition) {
+        int rowSize = getRowSize();
+        int colSize = getColSize();
+
+        return cellPosition.isRowGreaterThanOrEquals(rowSize)
+                || cellPosition.isColGreaterThanOrEquals(colSize);
     }
 
     public void initializeGame() {
@@ -98,10 +110,12 @@ public class GameBoard {
 
         for (int row = 0; row < rowSize; row++) {
             for (int col = 0; col < colSize; col++) {
-                if (isLandMineCell(row, col)) {
+                CellPosition cellPosition = CellPosition.of(row, col);
+
+                if (isLandMineCellAt(cellPosition)) {
                     continue;
                 }
-                int count = countNearbyLandMines(row, col);
+                int count = countNearbyLandMines(cellPosition);
                 if (count == 0) {
                     continue;
                 }
@@ -111,33 +125,33 @@ public class GameBoard {
         }
     }
 
-    private int countNearbyLandMines(int row, int col) {
+    private int countNearbyLandMines(CellPosition cellPosition) {
         int rowSize = getRowSize();
         int colSize = getColSize();
 
         int count = 0;
-        if (row - 1 >= 0 && col - 1 >= 0 && isLandMineCell(row - 1, col - 1)) {
+        if (row - 1 >= 0 && col - 1 >= 0 && isLandMineCellAt(row - 1, col - 1)) {
             count++;
         }
-        if (row - 1 >= 0 && isLandMineCell(row - 1, col)) {
+        if (row - 1 >= 0 && isLandMineCellAt(row - 1, col)) {
             count++;
         }
-        if (row - 1 >= 0 && col + 1 < colSize && isLandMineCell(row - 1, col + 1)) {
+        if (row - 1 >= 0 && col + 1 < colSize && isLandMineCellAt(row - 1, col + 1)) {
             count++;
         }
-        if (col - 1 >= 0 && isLandMineCell(row, col - 1)) {
+        if (col - 1 >= 0 && isLandMineCellAt(row, col - 1)) {
             count++;
         }
-        if (col + 1 < colSize && isLandMineCell(row, col + 1)) {
+        if (col + 1 < colSize && isLandMineCellAt(row, col + 1)) {
             count++;
         }
-        if (row + 1 < rowSize && col - 1 >= 0 && isLandMineCell(row + 1, col - 1)) {
+        if (row + 1 < rowSize && col - 1 >= 0 && isLandMineCellAt(row + 1, col - 1)) {
             count++;
         }
-        if (row + 1 < rowSize && isLandMineCell(row + 1, col)) {
+        if (row + 1 < rowSize && isLandMineCellAt(row + 1, col)) {
             count++;
         }
-        if (row + 1 < rowSize && col + 1 < colSize && isLandMineCell(row + 1, col + 1)) {
+        if (row + 1 < rowSize && col + 1 < colSize && isLandMineCellAt(row + 1, col + 1)) {
             count++;
         }
         return count;
@@ -151,21 +165,13 @@ public class GameBoard {
         return board[0].length;
     }
 
-    public boolean isInvalidRowIndex(int rowIndex) {
-        return getRowSize() >= rowIndex;
-    }
-
-    public boolean isInvalidColIndex(int colIndex) {
-        return getColSize() >= colIndex;
-    }
-
-    public String getSign(int rowIndex, int colIndex) {
-        Cell cell = findCell(rowIndex, colIndex);
+    public String getSign(CellPosition cellPosition) {
+        Cell cell = findCell(cellPosition);
         return cell.getSign();
     }
 
-    private Cell findCell(int rowIndex, int colIndex) {
-        return board[rowIndex][colIndex];
+    private Cell findCell(CellPosition cellPosition) {
+        return board[cellPosition.getRowIndex()][cellPosition.getColIndex()];
     }
 
 }
