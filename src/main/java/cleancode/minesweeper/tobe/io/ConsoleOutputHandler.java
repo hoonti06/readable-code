@@ -3,8 +3,8 @@ package cleancode.minesweeper.tobe.io;
 import cleancode.minesweeper.tobe.GameBoard;
 import cleancode.minesweeper.tobe.GameException;
 import cleancode.minesweeper.tobe.cell.CellSnapshot;
-import cleancode.minesweeper.tobe.cell.CellSnapshotStatus;
 import cleancode.minesweeper.tobe.position.CellPosition;
+import cleancode.minesweeper.tobe.sign.CellSignProvidable;
 import cleancode.minesweeper.tobe.sign.EmptyCellSignProvider;
 import cleancode.minesweeper.tobe.sign.FlagCellSignProvider;
 import cleancode.minesweeper.tobe.sign.LandMineCellSignProvider;
@@ -49,28 +49,18 @@ public class ConsoleOutputHandler implements OutputHandler {
      * 만약 enum에 타입이 하나 더 추가되면 그에 따른 대응을 개발자가 해줘야 한다
      */
     private String decideCellSignFrom(CellSnapshot snapshot) {
-        CellSnapshotStatus status = snapshot.getStatus();
-        if (status == CellSnapshotStatus.EMPTY) {
-            EmptyCellSignProvider cellSignProvider = new EmptyCellSignProvider();
-            return cellSignProvider.provide(snapshot);
-        }
-        if (status == CellSnapshotStatus.LAND_MINE) {
-            LandMineCellSignProvider cellSignProvider = new LandMineCellSignProvider();
-            return cellSignProvider.provide(snapshot);
-        }
-        if (status == CellSnapshotStatus.FLAG) {
-            FlagCellSignProvider cellSignProvider = new FlagCellSignProvider();
-            return cellSignProvider.provide(snapshot);
-        }
-        if (status == CellSnapshotStatus.NUMBER) {
-            NumberCellSIgnProvider cellSignProvider = new NumberCellSIgnProvider();
-            return cellSignProvider.provide(snapshot);
-        }
-        if (status == CellSnapshotStatus.UNCHECKED) {
-            UncheckedCellSignProvider cellSignProvider = new UncheckedCellSignProvider();
-            return cellSignProvider.provide(snapshot);
-        }
-        throw new IllegalArgumentException("확인할 수 없는 셀입니다.");
+        List<CellSignProvidable> cellSignProviders = List.of(
+                new EmptyCellSignProvider(),
+                new FlagCellSignProvider(),
+                new LandMineCellSignProvider(),
+                new NumberCellSIgnProvider(),
+                new UncheckedCellSignProvider()
+        );
+        return cellSignProviders.stream()
+                .filter(provider -> provider.supports(snapshot))
+                .findFirst()
+                .map(provider -> provider.provide(snapshot))
+                .orElseThrow(() -> new IllegalArgumentException("확인할 수 없는 셀입니다."));
     }
 
     private String generateColAlphabets(GameBoard board) {
