@@ -1,8 +1,14 @@
 package cleancode.minesweeper.tobe.sign;
 
 import cleancode.minesweeper.tobe.cell.CellSnapshot;
+import cleancode.minesweeper.tobe.cell.CellSnapshotStatus;
 
 public class NumberCellSIgnProvider implements CellSignProvidable {
+
+    @Override
+    public boolean supports(CellSnapshot cellSnapshot) {
+        return cellSnapshot.isSameStatus(CellSnapshotStatus.NUMBER);
+    }
 
     @Override
     public String provide(CellSnapshot cellSnapshot) {
