@@ -4,18 +4,15 @@ import cleancode.minesweeper.tobe.GameBoard;
 import cleancode.minesweeper.tobe.GameException;
 import cleancode.minesweeper.tobe.cell.CellSnapshot;
 import cleancode.minesweeper.tobe.position.CellPosition;
-import cleancode.minesweeper.tobe.sign.CellSignProvidable;
-import cleancode.minesweeper.tobe.sign.EmptyCellSignProvider;
-import cleancode.minesweeper.tobe.sign.FlagCellSignProvider;
-import cleancode.minesweeper.tobe.sign.LandMineCellSignProvider;
-import cleancode.minesweeper.tobe.sign.NumberCellSIgnProvider;
-import cleancode.minesweeper.tobe.sign.UncheckedCellSignProvider;
+import cleancode.minesweeper.tobe.sign.CellSignFinder;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class ConsoleOutputHandler implements OutputHandler {
+
+    private final CellSignFinder cellSignFinder = new CellSignFinder();
 
     @Override
     public void showGameStartComments() {
@@ -35,32 +32,13 @@ public class ConsoleOutputHandler implements OutputHandler {
                 CellPosition cellPosition = CellPosition.of(row, col);
 
                 CellSnapshot cellSnapshot = board.getSnapshot(cellPosition);
-                String cellSign = decideCellSignFrom(cellSnapshot);
+                String cellSign = cellSignFinder.findCellSignFrom(cellSnapshot);
 
                 System.out.print(cellSign + " ");
             }
             System.out.println();
         }
         System.out.println();
-    }
-
-    /**
-     * [코드 스멜]
-     * 만약 enum에 타입이 하나 더 추가되면 그에 따른 대응을 개발자가 해줘야 한다
-     */
-    private String decideCellSignFrom(CellSnapshot snapshot) {
-        List<CellSignProvidable> cellSignProviders = List.of(
-                new EmptyCellSignProvider(),
-                new FlagCellSignProvider(),
-                new LandMineCellSignProvider(),
-                new NumberCellSIgnProvider(),
-                new UncheckedCellSignProvider()
-        );
-        return cellSignProviders.stream()
-                .filter(provider -> provider.supports(snapshot))
-                .findFirst()
-                .map(provider -> provider.provide(snapshot))
-                .orElseThrow(() -> new IllegalArgumentException("확인할 수 없는 셀입니다."));
     }
 
     private String generateColAlphabets(GameBoard board) {
