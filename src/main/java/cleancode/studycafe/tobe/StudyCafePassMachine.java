@@ -44,14 +44,7 @@ public class StudyCafePassMachine {
         } else if (studyCafePassType == StudyCafePassType.WEEKLY) {
             outputHandler.showPassOrderSummary(selectedPass, null);
         } else if (studyCafePassType == StudyCafePassType.FIXED) {
-            List<StudyCafeLockerPass> lockerPasses = studyCafeFileHandler.readLockerPasses();
-            StudyCafeLockerPass lockerPass = lockerPasses.stream()
-                .filter(option ->
-                    option.getPassType() == selectedPass.getPassType()
-                        && option.getDuration() == selectedPass.getDuration()
-                )
-                .findFirst()
-                .orElse(null);
+            StudyCafeLockerPass lockerPass = selectLockerPass(studyCafeFileHandler, selectedPass);
 
             boolean lockerSelection = false;
             if (lockerPass != null) {
@@ -65,6 +58,18 @@ public class StudyCafePassMachine {
                 outputHandler.showPassOrderSummary(selectedPass, null);
             }
         }
+    }
+
+    private StudyCafeLockerPass selectLockerPass(StudyCafeFileHandler studyCafeFileHandler, StudyCafePass selectedPass) {
+        List<StudyCafeLockerPass> lockerPasses = studyCafeFileHandler.readLockerPasses();
+
+        return lockerPasses.stream()
+            .filter(option ->
+                option.getPassType() == selectedPass.getPassType()
+                    && option.getDuration() == selectedPass.getDuration()
+            )
+            .findFirst()
+            .orElse(null);
     }
 
 }
