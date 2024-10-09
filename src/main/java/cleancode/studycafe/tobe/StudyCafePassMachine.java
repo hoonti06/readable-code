@@ -33,7 +33,7 @@ public class StudyCafePassMachine {
         StudyCafePassType studyCafePassType = selectStudyCafePassType();
         List<StudyCafePass> studyCafePasses = studyCafeFileHandler.readStudyCafePasses();
         List<StudyCafePass> passCandidates = studyCafePasses.stream()
-                .filter(studyCafePass -> studyCafePass.getPassType() == studyCafePassType)
+                .filter(studyCafePass -> studyCafePass.hasSamePassType(studyCafePassType))
                 .toList();
 
         StudyCafePass selectedPass = selectStudyCafePass(passCandidates);
