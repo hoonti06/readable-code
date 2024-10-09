@@ -36,7 +36,7 @@ public class OutputHandler {
         System.out.println();
         String askMessage = String.format(
             "사물함을 이용하시겠습니까? (%s)",
-            lockerPass.display()
+            displayLockerPass(lockerPass)
         );
 
         System.out.println(askMessage);
@@ -48,7 +48,7 @@ public class OutputHandler {
         System.out.println("이용 내역");
         System.out.println("이용권: " + displayStudyCafePass(selectedPass));
         if (lockerPass != null) {
-            System.out.println("사물함: " + lockerPass.display());
+            System.out.println("사물함: " + displayLockerPass(lockerPass));
         }
 
         double discountRate = selectedPass.getDiscountRate();
@@ -72,6 +72,22 @@ public class OutputHandler {
             return String.format("%s주권 - %d원", duration, price);
         }
         if (studyCafePass.hasSamePassType(StudyCafePassType.FIXED)) {
+            return String.format("%s주권 - %d원", duration, price);
+        }
+        return "";
+    }
+
+    public String displayLockerPass(StudyCafeLockerPass lockerPass) {
+        int duration = lockerPass.getDuration();
+        int price = lockerPass.getPrice();
+
+        if (lockerPass.hasSamePassType(StudyCafePassType.HOURLY)) {
+            return String.format("%s시간권 - %d원", duration, price);
+        }
+        if (lockerPass.hasSamePassType(StudyCafePassType.WEEKLY)) {
+            return String.format("%s주권 - %d원", duration, price);
+        }
+        if (lockerPass.hasSamePassType(StudyCafePassType.FIXED)) {
             return String.format("%s주권 - %d원", duration, price);
         }
         return "";
