@@ -38,6 +38,10 @@ public class StudyCafePassMachine {
 
         StudyCafePass selectedPass = selectStudyCafePass(passCandidates);
 
+        showPassOrderSummary(studyCafePassType, selectedPass);
+    }
+
+    private void showPassOrderSummary(StudyCafePassType studyCafePassType, StudyCafePass selectedPass) {
         if (studyCafePassType == StudyCafePassType.HOURLY) {
             outputHandler.showPassOrderSummary(selectedPass, null);
         } else if (studyCafePassType == StudyCafePassType.WEEKLY) {
