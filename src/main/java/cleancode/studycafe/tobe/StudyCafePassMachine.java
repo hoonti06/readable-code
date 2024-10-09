@@ -30,8 +30,7 @@ public class StudyCafePassMachine {
         outputHandler.showWelcomeMessage();
         outputHandler.showAnnouncement();
 
-        outputHandler.askPassTypeSelection();
-        StudyCafePassType studyCafePassType = inputHandler.getPassTypeSelectingUserAction();
+        StudyCafePassType studyCafePassType = selectStudyCafePassType();
         List<StudyCafePass> studyCafePasses = studyCafeFileHandler.readStudyCafePasses();
         List<StudyCafePass> passCandidates = studyCafePasses.stream()
                 .filter(studyCafePass -> studyCafePass.getPassType() == studyCafePassType)
@@ -58,6 +57,11 @@ public class StudyCafePassMachine {
                 outputHandler.showPassOrderSummary(selectedPass, null);
             }
         }
+    }
+
+    private StudyCafePassType selectStudyCafePassType() {
+        outputHandler.askPassTypeSelection();
+        return inputHandler.getPassTypeSelectingUserAction();
     }
 
     private StudyCafeLockerPass selectLockerPass(StudyCafePass selectedPass) {
