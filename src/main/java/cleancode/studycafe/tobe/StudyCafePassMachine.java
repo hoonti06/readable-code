@@ -35,8 +35,8 @@ public class StudyCafePassMachine {
         List<StudyCafePass> passCandidates = studyCafePasses.stream()
                 .filter(studyCafePass -> studyCafePass.getPassType() == studyCafePassType)
                 .toList();
-        outputHandler.showPassListForSelection(passCandidates);
-        StudyCafePass selectedPass = inputHandler.getSelectPass(passCandidates);
+
+        StudyCafePass selectedPass = selectStudyCafePass(passCandidates);
 
         if (studyCafePassType == StudyCafePassType.HOURLY) {
             outputHandler.showPassOrderSummary(selectedPass, null);
@@ -57,6 +57,11 @@ public class StudyCafePassMachine {
                 outputHandler.showPassOrderSummary(selectedPass, null);
             }
         }
+    }
+
+    private StudyCafePass selectStudyCafePass(List<StudyCafePass> passCandidates) {
+        outputHandler.showPassListForSelection(passCandidates);
+        return inputHandler.getSelectPass(passCandidates);
     }
 
     private StudyCafePassType selectStudyCafePassType() {
